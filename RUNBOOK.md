@@ -13,7 +13,7 @@
 
 ## Sommaire
 
-1. [Contacts et astreintes](#1-contacts-et-astreintes)
+1. [Contacts et astreintes](#1-contacts-et-astreintes) · [Escalade](#escalade)
 2. [Accès d'urgence](#2-accès-durgence)
 3. [Secrets](#3-secrets)
 4. [Rollback et kill switch](#4-rollback-et-kill-switch)
@@ -32,7 +32,14 @@
 | 🏗️ Architecte développement | **Michel Astra** | Incident applicatif, rollback, correctif |
 | 🚨 Astreinte technique | Rotation hebdomadaire | Premier intervenant, 24/7 |
 
+### Escalade
 
+| Délai | Qui | Cas |
+|---|---|---|
+| Immédiat | 🚨 Astreinte | Tout incident |
+| +15 min | 🏗️ Michel Astra | Incident applicatif non résolu |
+| +30 min | 🔑 Jean Claude | Incident critique, ou **immédiatement** si fuite de secret |
+| +1 h | Client | Impact sur le service ou les données |
 
 ## 2. Accès d'urgence
 
@@ -149,7 +156,7 @@ Mesures prises : [actions]. La CNIL a été notifiée. Contact : [email].
 ## 8. Réponse à incident
 
 - [ ] **Détecter :** alerte Uptime Kuma, logs ou signalement
-- [ ] **Alerter :** astreinte, puis [escalade](#1-contacts-et-astreintes)
+- [ ] **Alerter :** astreinte, puis [escalade](#escalade)
 - [ ] **Contenir :** kill switch ou révocation des secrets
 - [ ] **Corriger :** rollback ou correctif
 - [ ] **Restaurer :** vérifier le service et les paiements
