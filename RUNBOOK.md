@@ -1,0 +1,92 @@
+# 🛡️ Runbook sécurité — E-commerce client
+
+> **Cas fictif** · Maintenance d'une application e-commerce
+> **Stack :** NextJS (front) · FastAPI (back) · PostgreSQL (BDD)
+
+---
+
+> [!CAUTION]
+> **Incident en cours ?**
+> 1. Appeler l'**astreinte**.
+> 2. En cas de **fuite de secret**, prévenir **Jean Claude** immédiatement.
+> 3. Contenir avec le [kill switch](#4-rollback-et-kill-switch), puis suivre la [checklist](#7-réponse-à-incident).
+
+## Sommaire
+
+1. [Contacts et astreintes](#1-contacts-et-astreintes)
+2. [Accès d'urgence](#2-accès-durgence)
+3. [Secrets](#3-secrets)
+4. [Rollback et kill switch](#4-rollback-et-kill-switch)
+5. [Journaux](#5-journaux)
+6. [Sauvegardes](#6-sauvegardes)
+7. [Réponse à incident](#7-réponse-à-incident)
+
+---
+
+## 1. Contacts et astreintes
+
+| Rôle | Nom | Quand l'appeler |
+|---|---|---|
+| 🔑 DSI, responsable des secrets | **Jean Claude** | **En priorité** pour toute fuite de secret |
+| 🏗️ Architecte développement | **Michel Astra** | Incident applicatif, rollback, correctif |
+| 🚨 Astreinte technique | Rotation hebdomadaire | Premier intervenant, 24/7 |
+
+**Escalade :** astreinte → Michel Astra *(+15 min)* → Jean Claude *(+30 min)* → client
+
+## 2. Accès d'urgence
+
+- **Comptes break-glass** (admin cloud, BDD) : dans le coffre de mots de passe, accessibles au DSI et à l'architecte uniquement.
+- **Serveurs :** VPN + SSH par clé, MFA obligatoire.
+- **Après usage :** journaliser l'accès, changer le mot de passe et le remettre dans le coffre.
+
+## 3. Secrets
+
+| Secret | Stockage | Responsable | Révocation / renouvellement |
+|---|---|---|---|
+| Clés API **Stripe** | Coffre + variables d'env. back | Jean Claude | Dashboard Stripe → *Roll key* → coffre → redéploiement |
+| Clés API **PayPal** | Coffre + variables d'env. back | Jean Claude | Console dev PayPal → régénérer → coffre → redéploiement |
+| Secrets **webhooks** | Coffre + variables d'env. back | Jean Claude | Régénérer le *signing secret* → mettre à jour le back → vérifier la réception |
+| Identifiants **PostgreSQL** | Coffre | Michel Astra | `ALTER ROLE … PASSWORD …` → config → redémarrer l'API |
+| Secret **JWT / sessions** | Coffre | Michel Astra | Changer le secret → redéployer *(toutes les sessions sont invalidées)* |
+
+> [!IMPORTANT]
+> **En cas de fuite :** prévenir Jean Claude → **révoquer** → **renouveler** → redéployer → analyser l'usage du secret dans les logs.
+> Si le secret a été commité, le purger aussi de l'historique git.
+
+## 4. Rollback et kill switch
+
+| Action | Procédure |
+|---|---|
+| **Rollback applicatif** | Jenkins → relancer le job de déploiement sur le dernier tag stable (front et back) |
+| **Rollback BDD** | Migration descendante testée, sinon [restauration de la sauvegarde](#6-sauvegardes) |
+| **Kill switch** | Mode maintenance (page statique) + coupure des paiements par feature flag |
+| **Dernier recours** | Désactiver les clés de paiement chez Stripe / PayPal |
+
+## 5. Journaux
+
+| Outil | Contenu |
+|---|---|
+| **Logger** (FastAPI / NextJS) | Erreurs, authentification, paiements |
+| **Jenkins** | Historique des déploiements (qui, quoi, quand) |
+| **Uptime Kuma** | Disponibilité du site et alertes |
+
+Conserver les logs au moins **90 jours** et ne rien supprimer pendant un incident.
+
+## 6. Sauvegardes
+
+| | |
+|---|---|
+| **Fréquence** | Dump PostgreSQL journalier |
+| **Stockage** | Chiffré, hors du serveur de production |
+| **Rétention** | 7 journalières + 4 hebdomadaires |
+| **Test** | Restauration mensuelle en recette |
+
+## 7. Réponse à incident
+
+- [ ] **Détecter :** alerte Uptime Kuma, logs ou signalement
+- [ ] **Alerter :** astreinte, puis [escalade](#1-contacts-et-astreintes)
+- [ ] **Contenir :** kill switch ou révocation des secrets
+- [ ] **Corriger :** rollback ou correctif
+- [ ] **Restaurer :** vérifier le service et les paiements
+- [ ] **Notifier :** le client, et la **CNIL sous 72 h** si des données personnelles sont touchées
+- [ ] **Post-mortem :** sous 5 jours ouvrés
