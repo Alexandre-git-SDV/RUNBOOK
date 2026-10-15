@@ -31,7 +31,7 @@
 | 🏗️ Architecte développement | **Michel Astra** | Incident applicatif, rollback, correctif |
 | 🚨 Astreinte technique | Rotation hebdomadaire | Premier intervenant, 24/7 |
 
-**Escalade :** astreinte → Michel Astra *(+15 min)* → Jean Claude *(+30 min)* → client
+
 
 ## 2. Accès d'urgence
 
@@ -81,7 +81,13 @@ Conserver les logs au moins **90 jours** et ne rien supprimer pendant un inciden
 | **Rétention** | 7 journalières + 4 hebdomadaires |
 | **Test** | Restauration mensuelle en recette |
 
-## 7. Réponse à incident
+La date de la dernière sauvegarde réalisée à été réalisée à 3h UTC+2
+
+## 7. Modèle de message
+
+Sauvegarde : La sauvegarde à été réalisée le JJ/MM/AAAA HH:mm
+
+## 8. Réponse à incident
 
 - [ ] **Détecter :** alerte Uptime Kuma, logs ou signalement
 - [ ] **Alerter :** astreinte, puis [escalade](#1-contacts-et-astreintes)
