@@ -13,6 +13,7 @@ Le runbook indique **qui appeler** et **quoi faire** en cas d'incident :
 - **Secrets :** où ils sont, qui en est responsable, comment les révoquer et les renouveler
 - **Rollback et kill switch :** revenir en arrière ou couper le service et les paiements
 - **Journaux et sauvegardes :** les sources de logs, la rétention, les restaurations
+- **Modèles de messages :** sauvegarde, fuite de secret, incident, rollback, résolution
 - **Réponse à incident :** une checklist de la détection au post-mortem
 
 > ⚠️ Aucun secret réel ne doit être versionné dans ce dépôt : il contient des procédures, pas des identifiants.

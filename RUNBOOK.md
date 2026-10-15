@@ -9,7 +9,7 @@
 > **Incident en cours ?**
 > 1. Appeler l'**astreinte**.
 > 2. En cas de **fuite de secret**, prévenir **Jean Claude** immédiatement.
-> 3. Contenir avec le [kill switch](#4-rollback-et-kill-switch), puis suivre la [checklist](#7-réponse-à-incident).
+> 3. Contenir avec le [kill switch](#4-rollback-et-kill-switch), puis suivre la [checklist](#8-réponse-à-incident).
 
 ## Sommaire
 
@@ -19,7 +19,8 @@
 4. [Rollback et kill switch](#4-rollback-et-kill-switch)
 5. [Journaux](#5-journaux)
 6. [Sauvegardes](#6-sauvegardes)
-7. [Réponse à incident](#7-réponse-à-incident)
+7. [Modèles de messages](#7-modèles-de-messages)
+8. [Réponse à incident](#8-réponse-à-incident)
 
 ---
 
@@ -81,11 +82,69 @@ Conserver les logs au moins **90 jours** et ne rien supprimer pendant un inciden
 | **Rétention** | 7 journalières + 4 hebdomadaires |
 | **Test** | Restauration mensuelle en recette |
 
-La date de la dernière sauvegarde réalisée à été réalisée à 3h UTC+2
+La dernière sauvegarde a été réalisée à 3h UTC+2.
 
-## 7. Modèle de message
+## 7. Modèles de messages
 
-Sauvegarde : La sauvegarde à été réalisée le JJ/MM/AAAA HH:mm
+> Remplacer les champs `[…]`. Ne jamais inclure de secret dans un message.
+
+### 💾 Sauvegardes
+
+**Sauvegarde réussie**
+```
+✅ [SAUVEGARDE] Sauvegarde PostgreSQL réalisée le JJ/MM/AAAA à HH:mm — taille : [X] Go — stockée chiffrée hors prod.
+```
+
+**Échec de sauvegarde**
+```
+❌ [SAUVEGARDE] Échec du dump PostgreSQL du JJ/MM/AAAA à HH:mm — erreur : [message].
+Dernière sauvegarde valide : JJ/MM/AAAA HH:mm. Relance en cours par [nom].
+```
+
+**Restauration**
+```
+♻️ [RESTAURATION] Restauration de la sauvegarde du JJ/MM/AAAA HH:mm sur [prod/recette] lancée à HH:mm par [nom].
+Perte de données possible depuis cette date. Fin estimée : HH:mm.
+```
+
+### 🔑 Fuite de secret *(interne)*
+
+```
+🚨 [FUITE SECRET] Secret exposé : [Stripe / PayPal / BDD / JWT…] — détecté le JJ/MM/AAAA à HH:mm via [source].
+@Jean Claude prévenu. Révocation : [en cours / faite]. Ne pas réutiliser l'ancien secret.
+```
+
+### ⚠️ Incident en cours *(client)*
+
+```
+Bonjour, nous constatons depuis HH:mm un incident affectant [service / paiements].
+Nos équipes sont mobilisées. Prochain point à HH:mm.
+```
+
+### 🛑 Kill switch / maintenance
+
+```
+🛑 [KILL SWITCH] Site en maintenance et paiements coupés depuis HH:mm par [nom]. Motif : [raison].
+```
+
+### ↩️ Rollback
+
+```
+↩️ [ROLLBACK] Retour à la version [tag] effectué à HH:mm par [nom]. Service vérifié : [oui/non].
+```
+
+### ✅ Résolution
+
+```
+✅ [RÉSOLU] Incident du JJ/MM/AAAA résolu à HH:mm. Cause : [résumé]. Post-mortem prévu le JJ/MM/AAAA.
+```
+
+### 🔒 Violation de données personnelles *(client / utilisateurs)*
+
+```
+Le JJ/MM/AAAA, nous avons détecté un accès non autorisé à [type de données].
+Mesures prises : [actions]. La CNIL a été notifiée. Contact : [email].
+```
 
 ## 8. Réponse à incident
 
